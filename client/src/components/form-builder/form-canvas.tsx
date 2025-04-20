@@ -80,7 +80,20 @@ export default function FormCanvas({
     e.preventDefault();
     handleDragLeave();
     
-    // This is handled by the parent component that provides the elements
+    // Get the element type from the data transfer
+    const elementType = e.dataTransfer.getData('elementType');
+    
+    if (elementType && onElementDrop) {
+      // Forward the elementType to the page component
+      // This is a patch to fix the drop functionality which was previously not implemented
+      if (typeof window !== 'undefined') {
+        // Create a custom event to trigger adding a new element of this type
+        const event = new CustomEvent('form-element-drop', { 
+          detail: { elementType }
+        });
+        window.dispatchEvent(event);
+      }
+    }
   };
   
   const handleUndo = () => {
