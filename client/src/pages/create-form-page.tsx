@@ -5,7 +5,7 @@ import FormCanvas from "@/components/form-builder/form-canvas";
 import CodeEditor from "@/components/form-builder/code-editor";
 import ResultDisplay from "@/components/form-builder/result-display";
 import { useAuth } from "@/hooks/use-auth";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FormElement, FormSchema } from "@shared/schema";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -34,6 +34,39 @@ export default function CreateFormPage() {
   const handleElementDrop = (element: FormElement) => {
     setFormElements([...formElements, element]);
   };
+  
+  // Listen for the custom form-element-drop event
+  useEffect(() => {
+    const handleFormElementDrop = (event: any) => {
+      if (event.detail && event.detail.elementType) {
+        // Create a new form element with default properties
+        const newElement: FormElement = {
+          id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 11),
+          type: event.detail.elementType,
+          label: `New ${event.detail.elementType.charAt(0).toUpperCase() + event.detail.elementType.slice(1)}`,
+          name: `${event.detail.elementType}_${Date.now()}`,
+          required: false,
+          placeholder: `Enter ${event.detail.elementType}...`,
+        };
+        
+        // Add options for select and radio types
+        if (event.detail.elementType === 'select' || event.detail.elementType === 'radio') {
+          newElement.options = [
+            { label: 'Option 1', value: 'option1' },
+            { label: 'Option 2', value: 'option2' },
+          ];
+        }
+        
+        handleElementDrop(newElement);
+      }
+    };
+    
+    window.addEventListener('form-element-drop', handleFormElementDrop);
+    
+    return () => {
+      window.removeEventListener('form-element-drop', handleFormElementDrop);
+    };
+  }, [formElements]);
   
   // Function to remove element from the canvas
   const handleElementRemove = (elementId: string) => {

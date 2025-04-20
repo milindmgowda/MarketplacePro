@@ -83,7 +83,7 @@ export default function FormCanvas({
     // Get the element type from the data transfer
     const elementType = e.dataTransfer.getData('elementType');
     
-    if (elementType && onElementDrop) {
+    if (elementType) {
       // Forward the elementType to the page component
       // This is a patch to fix the drop functionality which was previously not implemented
       if (typeof window !== 'undefined') {

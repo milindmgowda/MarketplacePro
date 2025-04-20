@@ -382,6 +382,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       next(error);
     }
   });
+  
+  // Test endpoint to execute JavaScript code without saving it
+  app.post("/api/forms/test/execute", async (req, res, next) => {
+    try {
+      const { code, formData } = req.body;
+      
+      if (!code) {
+        return res.status(400).json({ message: "No code provided" });
+      }
+      
+      // Execute the JavaScript code
+      let result;
+      try {
+        result = await executeJavaScript(code, formData || {});
+      } catch (error: any) {
+        return res.status(400).json({
+          message: "Script execution failed",
+          error: error.message,
+        });
+      }
+      
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  });
 
   // Update user settings
   app.put("/api/settings", ensureAuthenticated, async (req, res, next) => {
