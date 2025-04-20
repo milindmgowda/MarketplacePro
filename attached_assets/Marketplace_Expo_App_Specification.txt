@@ -1,0 +1,128 @@
+FULL-STACK MARKETPLACE + EXPO APPLICATION SPECIFICATION
+
+OVERVIEW:
+This document outlines a comprehensive full-stack application to be developed using modern technologies, with MongoDB as the primary database. CI/CD and deployment configurations are explicitly excluded. The application is designed to function as a marketplace and expo platform that allows users to build custom drag-and-drop forms, attach executable JavaScript logic, and view live outputs after form submission.
+
+CORE PLATFORM DEFINITION:
+The application is a marketplace and form-based expo where users can:
+- Create custom UI forms via a drag-and-drop interface.
+- Attach JavaScript code to forms to process input data.
+- Submit the form and dynamically execute user-provided JavaScript code.
+- Display the output directly beneath the form without page reload.
+
+MODULES:
+
+1. AUTHENTICATION AND SECURITY
+- Implement secure email/password-based signup and login.
+- Hash all passwords using bcrypt before storing in MongoDB.
+- Use JSON Web Tokens (JWT) for session management including access and refresh tokens.
+- Provide OAuth2-based social login (Google, Facebook).
+- Add brute-force protection using rate limiting on sensitive endpoints.
+- Include user logout and token invalidation functionality.
+
+2. OTP-BASED VERIFICATION
+- Generate and store time-bound OTPs in MongoDB with TTL indexing.
+- Support OTP delivery via email and SMS during registration and login.
+- Securely validate OTPs with retry attempt limits and expiration checks.
+
+3. USER PROFILE MANAGEMENT
+- Endpoints for profile view and updates (name, email, phone, profile image).
+- Allow users to update password with old password verification.
+- Enable account deactivation or deletion.
+- Store audit logs of all profile changes.
+
+4. EMAIL INTEGRATION
+- Integrate a transactional email service (Mailtrap, SendGrid, or Nodemailer with SMTP).
+- Send account verification, password reset, welcome, and OTP emails.
+- Log all emails (type, timestamp, delivery status) in MongoDB.
+
+5. SMS INTEGRATION
+- Integrate SMS delivery (Twilio or mock service).
+- Use SMS for OTP and account alerts.
+- Log SMS attempts and delivery status in MongoDB.
+
+6. ROLE-BASED ACCESS CONTROL (RBAC)
+- Define roles: user, admin.
+- Admin has access to manage users, view logs, and analytics.
+- Implement middleware-based role enforcement on routes.
+
+7. NOTIFICATIONS
+- In-app notification system per user.
+- Types include: profile update, new form submission, public form interactions.
+- Ability to mark notifications as read or delete them.
+- Stored in MongoDB with metadata.
+
+8. ACTIVITY LOGGING
+- Log actions such as login, logout, form creation, form execution.
+- Logs include user ID, timestamp, IP address, action type.
+- Store logs in a separate MongoDB collection.
+
+9. USER SETTINGS
+- Allow control over notification preferences (email, SMS, in-app), language, and timezone.
+- Store user settings in an embedded or referenced MongoDB document.
+
+10. FORM BUILDER FUNCTIONALITY
+- Provide a drag-and-drop interface to create form schemas.
+- Form elements: text input, number input, checkbox, radio, select, group fields.
+- Save form schemas as JSON in MongoDB.
+- Allow preview and edit of saved forms.
+
+11. JAVASCRIPT EDITOR FUNCTIONALITY
+- Integrated JavaScript editor using Monaco Editor or CodeMirror.
+- Users write custom JavaScript logic that uses form inputs as variables.
+- Example: If form input is 'age', user can write `if (age > 18) return "Adult";`
+
+12. FORM SUBMISSION AND CODE EXECUTION
+- On submission, collect form inputs and inject into JS context.
+- Use a secure sandbox like vm2 or isolated-vm to execute user code.
+- Catch and report runtime errors.
+- Display return value from user code below the form dynamically.
+
+13. FORM SHARING AND EXPO
+- Forms can be shared as public or private.
+- Public forms appear on an Explore page.
+- Each form has title, description, category, and author.
+- Include form execution stats and history.
+
+14. FRONTEND STACK
+- React or Next.js
+- Tailwind CSS or Material UI
+- Responsive layout for mobile and desktop
+- Accessible design practices (ARIA, keyboard nav)
+- Dark mode toggle with persistence in user settings
+
+15. BACKEND STACK
+- Node.js with Express (or NestJS)
+- TypeScript recommended for maintainability
+- MongoDB with Mongoose schema validation
+- Rate limiting, input sanitization, centralized error handling
+- Modular folder structure: routes, controllers, services, models
+
+16. DATABASE COLLECTIONS
+- users
+- forms
+- scripts
+- form_submissions
+- execution_logs
+- notifications
+- emails
+- sms_logs
+- user_settings
+- activity_logs
+
+17. ERROR HANDLING AND LOGGING
+- Central error middleware with structured logs
+- Return user-friendly messages with appropriate HTTP status codes
+- Store errors in MongoDB for debugging
+
+18. ANALYTICS
+- Track number of form executions, active users, signups
+- Store stats in MongoDB for admin retrieval
+- Summary APIs for dashboard views
+
+19. CODE STRUCTURE AND CONFIGURATION
+- Use .env for sensitive variables (JWT secret, DB URI, email/SMS keys)
+- Provide .env.example file
+- Maintain separation of concerns for scalability and maintainability
+
+END OF SPECIFICATION
