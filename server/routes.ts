@@ -1,6 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storage } from "./storage-factory";
 import { setupAuth } from "./auth";
 import { executeJavaScript } from "./form-execution";
 import { z } from "zod";

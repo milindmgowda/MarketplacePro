@@ -65,6 +65,7 @@ export const userSettings = pgTable("user_settings", {
   emailNotifications: boolean("email_notifications").default(true),
   smsNotifications: boolean("sms_notifications").default(false),
   language: text("language").default("en"),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 // Activity logs table

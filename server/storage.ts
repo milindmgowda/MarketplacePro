@@ -136,6 +136,7 @@ export class MemStorage implements IStorage {
     const user: User = {
       ...insertUser,
       id,
+      fullName: insertUser.fullName || null,
       isAdmin: false,
       profileImage: null,
     };
@@ -180,6 +181,8 @@ export class MemStorage implements IStorage {
     const form: Form = {
       ...insertForm,
       id,
+      description: insertForm.description || null,
+      isPublic: insertForm.isPublic || false,
       createdAt: now,
       updatedAt: now,
     };
@@ -266,11 +269,13 @@ export class MemStorage implements IStorage {
     const id = this.submissionIdCounter++;
     const now = new Date();
     const formSubmission: FormSubmission = {
-      ...submission,
       id,
       submittedAt: now,
       formId: submission.formId!,
       formData: submission.formData!,
+      userId: submission.userId || null,
+      ip: submission.ip || null,
+      scriptOutput: submission.scriptOutput || null,
     };
     this.formSubmissionsMap.set(id, formSubmission);
     return formSubmission;
@@ -297,7 +302,7 @@ export class MemStorage implements IStorage {
       message: notification.message!,
       isRead: notification.isRead || false,
       createdAt: now,
-      metadata: notification.metadata || null,
+      metadata: notification.metadata || {},
     };
     this.notificationsMap.set(id, newNotification);
     return newNotification;
@@ -326,13 +331,15 @@ export class MemStorage implements IStorage {
 
   async createUserSettings(userId: number): Promise<UserSetting> {
     const id = this.settingsIdCounter++;
+    const now = new Date();
     const settings: UserSetting = {
       id,
       userId,
-      theme: 'light',
+      theme: 'system',
       emailNotifications: true,
       smsNotifications: false,
       language: 'en',
+      updatedAt: now
     };
     this.userSettingsMap.set(id, settings);
     return settings;
@@ -343,7 +350,7 @@ export class MemStorage implements IStorage {
     if (!settings) {
       throw new Error(`User settings with ID ${id} not found`);
     }
-    const updatedSettings = { ...settings, ...data };
+    const updatedSettings = { ...settings, ...data, updatedAt: new Date() };
     this.userSettingsMap.set(id, updatedSettings);
     return updatedSettings;
   }
@@ -354,12 +361,12 @@ export class MemStorage implements IStorage {
     const now = log.timestamp || new Date();
     const activityLog: ActivityLog = {
       id,
-      userId: log.userId,
+      userId: log.userId!,
       action: log.action!,
-      ip: log.ip || null,
-      userAgent: log.userAgent || null,
+      ip: log.ip || '',
+      userAgent: log.userAgent || '',
       timestamp: now,
-      details: log.details || null,
+      details: log.details || {},
     };
     this.activityLogsMap.set(id, activityLog);
     return activityLog;
@@ -371,5 +378,3 @@ export class MemStorage implements IStorage {
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
   }
 }
-
-export const storage = new MemStorage();
